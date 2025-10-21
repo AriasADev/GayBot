@@ -1,12 +1,15 @@
 import { Client, ClientOptions, GatewayIntentBits, Partials, Message, PartialMessage } from 'discord.js';
 import { KeywordChecker } from './keyword-checker';
+import * as dotenv from "dotenv";
 import { ObjectAny, QueueEntry } from './types';
+
+dotenv.config()
 
 // --- Configuration and Setup --
 
 
 
-const DISCORD_TOKEN = '[no lul]'; 
+const DISCORD_TOKEN = process.env.BOT_TOKEN; 
 
 const keywordChecker = new KeywordChecker();
 
