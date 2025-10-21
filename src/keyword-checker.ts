@@ -33,7 +33,7 @@ export class KeywordChecker {
                 
                 const regex = new RegExp(`\\b${escapedKeyword}${pluralization}\\b`);
                 
-                return console.log("TEST:" + regex.test(lowerMessage) );
+                return regex.test(lowerMessage);
 
                 
             });
