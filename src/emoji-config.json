@@ -1,0 +1,52 @@
+[
+    {
+        "emoji": "🏳️‍🌈",
+        "title": "Gay Flag",
+        "keywords": ["gay", "homo", "gaii", "gae", "fag", "faggot", "queer", "lgbt", "mlm", "men"]
+    },
+    {
+        "emoji": "<:girl_lesbian_flag:1406109269971046462>",
+        "title": "Lesbian Flag",
+        "keywords": ["lesb", "lesbian", "wlw", "lesbi", "women", "girls", "dyke", "sapphic", "lipstick", "femme", "butch"]
+    },
+    {
+        "emoji": "<:girl_lesbean:1410684874536386742>",
+        "title": "Lesbean",
+        "keywords": ["lesbean", "les bean", "les-bean", "bean", "beanie"]
+    },
+    {
+        "emoji": "🏳️‍⚧️",
+        "title": "Trans Flag",
+        "keywords": ["trans", "tranz", "transgender", "sans", "ftm", "mtf", "trans masc", "trans fem", "t4t"]
+    },
+    {
+        "emoji": "<:girl_bisexual_flag:1411763935987630153>",
+        "title": "Bisexual Flag",
+        "keywords": ["bi", "bisexual", "bisexy", "bi-curious"]
+    },
+    {
+        "emoji": "<:girl_asexual_flag:1411764530471637063>",
+        "title": "Asexual Flag",
+        "keywords": ["ace", "asexual", "aro", "aromantic", "demi", "grey-ace", "a-spec"]
+    },
+    {
+        "emoji": "<:girl_lesbianCat:1423465325306839133>",
+        "title": "UwU",
+        "keywords": ["uwu", "owo", ":3", ";3", "^w^", "qwp", "xd", ":>", "teehee"]
+    },
+    {
+        "emoji": "<:girl_gotobed:1429282327334355047>",
+        "title": "Tired",
+        "keywords": ["tired", "sleepy", "eepy", "bed", "nappy", "snooze", "exhausted", "zzz"]
+    },
+    {
+        "emoji": "🌟",
+        "title": "Positive Feedback",
+        "keywords": ["star", "amazing", "brilliant", "wonderful", "awesome", "great", "fantastic", "slay", "ate", "pop off", "iconic", "pog", "based"]
+    },
+    {
+        "emoji": "💔",
+        "title": "Negative Feedback",
+        "keywords": ["bad", "terrible", "worst", "awful", "trash", "cringe", "gross", "yikes", "fail", "not good"]
+    }
+]

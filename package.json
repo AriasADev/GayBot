@@ -1,0 +1,24 @@
+{
+    "name": "gaybot",
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/index.js",
+    "keywords": [],
+    "author": "REfurbished By: Lemi the photographer, OG: MeltyMooncakes and Ariablah",
+    "license": "ISC",
+    "scripts": {
+        "test": "npm run build && node dist/index.js",
+        "build": "tsc",
+        "build:watch": "nodemon --watch src --ext ts --exec npm run build",
+        "start": "node dist/index.js",
+        "dev": "nodemon --watch src --ext ts --exec \"npm run build && npm run start\""
+    },
+    "devDependencies": {
+        "@types/node": "^22.18.12",
+        "typescript": "^5.9.3"
+    },
+    "dependencies": {
+        "discord.js": "^14.16.3",
+        "nodemon": "^3.1.10"
+    }
+}
