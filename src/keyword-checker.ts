@@ -19,17 +19,23 @@ export class KeywordChecker {
             return [];
         }
 
-        const tokens = messageContent
-            .toLowerCase()
-            .replace(/[^\w\s]/g, ' ')
-            .split(/\s+/)
-            .filter(token => token.length > 0);
+        const lowerMessage = messageContent.toLowerCase();
 
         const foundEmojis = new Set<string>();
 
         this.emojiMap.forEach(item => {
             const matchFound = item.keywords.some(keyword => {
-                return tokens.includes(keyword.toLowerCase());
+                const lowerKeyword = keyword.toLowerCase();
+                
+                const escapedKeyword = lowerKeyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+                const pluralization = '(s|es)?';
+                
+                const regex = new RegExp(`\\b${escapedKeyword}${pluralization}\\b`);
+                
+                return console.log("TEST:" + regex.test(lowerMessage) );
+
+                
             });
 
             if (matchFound) {
