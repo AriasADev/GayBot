@@ -4,7 +4,7 @@
     "description": "",
     "main": "dist/index.js",
     "keywords": [],
-    "author": "REfurbished By: Lemi the photographer, OG: MeltyMooncakes and Ariablah",
+    "author": "REfurbished By: Lemi the photographer, OG: MeltyMooncakes and AriasADev",
     "license": "ISC",
     "scripts": {
         "test": "npm run build && node dist/index.js",

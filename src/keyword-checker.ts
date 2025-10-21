@@ -12,7 +12,6 @@ export class KeywordChecker {
 
     constructor() {
         this.emojiMap = emojiMap;
-        console.log(`KeywordChecker initialized and loaded ${this.emojiMap.length} emoji categories.`);
     }
 
     public getMatchingEmojis(messageContent: string): string[] {
@@ -20,13 +19,17 @@ export class KeywordChecker {
             return [];
         }
 
-        const lowerMessage = messageContent.toLowerCase();
+        const tokens = messageContent
+            .toLowerCase()
+            .replace(/[^\w\s]/g, ' ')
+            .split(/\s+/)
+            .filter(token => token.length > 0);
 
         const foundEmojis = new Set<string>();
 
         this.emojiMap.forEach(item => {
             const matchFound = item.keywords.some(keyword => {
-                return lowerMessage.includes(keyword.toLowerCase());
+                return tokens.includes(keyword.toLowerCase());
             });
 
             if (matchFound) {
