@@ -1,18 +1,8 @@
-import { 
-    Client, 
-    GatewayIntentBits, 
-    Partials, 
-    Message, 
-    PartialMessage, 
-    Interaction, 
-    Collection 
-} from 'discord.js';
-import * as dotenv from "dotenv";
-
-import { loadCommands } from './core/deploy'; 
-import { IApplicationCommand } from './core/IApplicationCommand'; 
-
+import { Client, ClientOptions, GatewayIntentBits, Partials, Message, PartialMessage, Interaction } from 'discord.js';
 import { KeywordChecker } from './keyword-checker';
+import { handleCommand } from './handlers/commandHandler';
+import { registerCommands } from './commands/register';
+import * as dotenv from "dotenv";
 import { ObjectAny, QueueEntry } from './types';
 
 dotenv.config()
@@ -20,9 +10,6 @@ dotenv.config()
 // --- Configuration and Setup --
 
 
-interface CustomClient extends Client {
-    commands: Collection<string, IApplicationCommand>;
-}
 
 const DISCORD_TOKEN = process.env.BOT_TOKEN; 
 
@@ -35,15 +22,12 @@ const client = new Client({
         GatewayIntentBits.MessageContent,
     ],
     partials: [Partials.Message, Partials.Channel],
-}) as CustomClient;
-
-client.commands = new Collection<string, IApplicationCommand>();
-
-
-// --- Core ---
+});
 
 const reactionQueue: QueueEntry[] = [];
 let isProcessingQueue = false;
+
+// --- Core ---
 
 async function handleMessageKeywords(message: Message | PartialMessage) {
     if (message.partial) {
@@ -97,12 +81,16 @@ async function processReactionQueue() {
     }
 }
 
+
 // --- Discord Event Handlers ---
 
 client.once('clientReady', async () => {
     console.log(`🚀 Bot is ready! Logged in as ${client.user?.tag}`);
     
-    await loadCommands(client);
+    // Register slash commands
+    if (client.user) {
+        await registerCommands(client.user.id);
+    }
     
     setInterval(processReactionQueue, 1000); 
 });
@@ -114,26 +102,19 @@ client.on('messageCreate', (message: Message) => {
 
 
 client.on('messageUpdate', (oldMessage: Message | PartialMessage, newMessage: Message | PartialMessage) => {
+
     handleMessageKeywords(newMessage);
 });
 
 
 // Handle slash command interactions
-
 client.on('interactionCreate', async (interaction: Interaction) => {
     if (!interaction.isCommand()) return;
     
-    const command = client.commands.get(interaction.commandName);
-
-    if (!command) {
-        console.error(`No command matching ${interaction.commandName} found in collection.`);
-        return;
-    }
-
     try {
-        await command.execute(interaction);
+        await handleCommand(interaction);
     } catch (error) {
-        console.error('Error executing command:', error);
+        console.error('Error handling command:', error);
         
         const errorMessage = { content: 'There was an error executing this command!', ephemeral: true };
         
@@ -151,6 +132,7 @@ client.on('error', (error) => {
 });
 
 
+
 client.login(DISCORD_TOKEN).catch(err => {
-    console.error("Failed to login to Discord. Check your BOT_TOKEN.", err);
+    console.error("Failed to login to Discord. Check your DISCORD_TOKEN.", err);
 });
