@@ -4,7 +4,8 @@ import {
     ApplicationCommandOptionType,
     InteractionContextType,
     ApplicationIntegrationType,
-    RESTPostAPIChatInputApplicationCommandsJSONBody
+    RESTPostAPIChatInputApplicationCommandsJSONBody,
+    MessageFlags
 } from 'discord.js';
 import { IApplicationCommand } from '../core/IApplicationCommand';
 
@@ -29,7 +30,7 @@ const pingCommand: IApplicationCommand = {
   async execute(interaction) {
     const chatInteraction = interaction as ChatInputCommandInteraction;
     
-    await chatInteraction.deferReply({ ephemeral: true }); 
+    await chatInteraction.deferReply({ flags: MessageFlags.Ephemeral }); 
     
     const sent = await chatInteraction.editReply({ content: 'Pinging...' });
     const latency = sent.createdTimestamp - chatInteraction.createdTimestamp;
