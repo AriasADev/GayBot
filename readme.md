@@ -1,25 +1,47 @@
-to install the stuff do
+## GayBot
+
+The easiest and fastest way to install the bot is by using the [official Discord install link](https://discord.com/oauth2/authorize?client_id=1386796424720810234&permissions=67648&integration_type=0&scope=bot+applications.commands)
+
+### Basic Setup
+
+Move the .env.example file to .env
 ```sh
-sudo npm install -G typescript
-npm run build
+mv .env.example .env
 ```
 
-to run do 
+This bot uses the Node Package Manager (or npm for short)
+
+### p/npm:
+
+You can replace any use of `pnpm` here with `npm`
+
+To install the bot's dependancies do:
 ```sh
-npm run start
+pnpm install
 ```
 
-to test
+To build and run, use:
 ```sh
-npm run test
+pnpm run build
+pnpm run start
 ```
 
-to run in development mode
+To test
 ```sh
-npm run dev
+pnpm run test
 ```
 
-to build and watch
+To run in development mode
 ```sh
-npm run build:watch
+pnpm run dev
 ```
+
+To build and watch
+```sh
+pnpm run build:watch
+```
+
+### Contributors
+<a href="https://github.com/AriasADev/GayBot/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=AriasADev/GayBot" />
+</a>

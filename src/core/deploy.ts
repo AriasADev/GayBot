@@ -3,9 +3,15 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { IApplicationCommand, CommandCollection } from './IApplicationCommand';
 
-const TOKEN = process.env.TOKEN;
+const TOKEN = process.env.BOT_TOKEN;
 const CLIENT_ID = process.env.CLIENT_ID;
 const GUILD_ID = process.env.GUILD_ID;
+
+// ADD DEBUG LOGGING
+console.log('[DEBUG] Environment variables:');
+console.log('BOT_TOKEN:', TOKEN ? '✓ Set' : '✗ Not set');
+console.log('CLIENT_ID:', CLIENT_ID ? '✓ Set' : '✗ Not set');
+console.log('GUILD_ID:', GUILD_ID ? '✓ Set (optional)' : '✗ Not set (optional)');
 
 export async function loadCommands(client: Client): Promise<void> {
   if (!(client as any).commands) {
@@ -15,14 +21,14 @@ export async function loadCommands(client: Client): Promise<void> {
   const commandsToDeploy: IApplicationCommand['data'][] = [];
   const commandsCollection = (client as any).commands as CommandCollection;
   
-  const commandsPath = path.join(process.cwd(), 'src', 'commands'); 
+  const commandsPath = path.join(process.cwd(), 'dist', 'commands'); 
   
   const statusReport: string[] = [];
   let loadedCount = 0;
 
   try {
     const commandFiles = fs.readdirSync(commandsPath)
-      .filter(file => file.endsWith('.ts') || file.endsWith('.js'));
+      .filter(file => file.endsWith('.js'));
 
     for (const file of commandFiles) {
       const filePath = path.join(commandsPath, file);

@@ -8,14 +8,13 @@ import {
     Collection 
 } from 'discord.js';
 import * as dotenv from "dotenv";
+dotenv.config()
 
 import { loadCommands } from './core/deploy'; 
 import { IApplicationCommand } from './core/IApplicationCommand'; 
 
 import { KeywordChecker } from './keyword-checker';
 import { ObjectAny, QueueEntry } from './types';
-
-dotenv.config()
 
 // --- Configuration and Setup --
 
