@@ -1,5 +1,7 @@
-import { Client, ClientOptions, GatewayIntentBits, Partials, Message, PartialMessage } from 'discord.js';
+import { Client, ClientOptions, GatewayIntentBits, Partials, Message, PartialMessage, Interaction } from 'discord.js';
 import { KeywordChecker } from './keyword-checker';
+import { handleCommand } from './handlers/commandHandler';
+import { registerCommands } from './commands/register';
 import * as dotenv from "dotenv";
 import { ObjectAny, QueueEntry } from './types';
 
@@ -82,8 +84,14 @@ async function processReactionQueue() {
 
 // --- Discord Event Handlers ---
 
-client.once('clientReady', () => {
+client.once('clientReady', async () => {
     console.log(`🚀 Bot is ready! Logged in as ${client.user?.tag}`);
+    
+    // Register slash commands
+    if (client.user) {
+        await registerCommands(client.user.id);
+    }
+    
     setInterval(processReactionQueue, 1000); 
 });
 
@@ -97,6 +105,27 @@ client.on('messageUpdate', (oldMessage: Message | PartialMessage, newMessage: Me
 
     handleMessageKeywords(newMessage);
 });
+
+
+// Handle slash command interactions
+client.on('interactionCreate', async (interaction: Interaction) => {
+    if (!interaction.isCommand()) return;
+    
+    try {
+        await handleCommand(interaction);
+    } catch (error) {
+        console.error('Error handling command:', error);
+        
+        const errorMessage = { content: 'There was an error executing this command!', ephemeral: true };
+        
+        if (interaction.replied || interaction.deferred) {
+            await interaction.followUp(errorMessage);
+        } else {
+            await interaction.reply(errorMessage);
+        }
+    }
+});
+
 
 client.on('error', (error) => {
     console.error('A client error occurred:', error);
