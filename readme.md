@@ -2,16 +2,36 @@
 
 The easiest and fastest way to install the bot is by using the [official Discord install link](https://discord.com/oauth2/authorize?client_id=1386796424720810234&permissions=67648&integration_type=0&scope=bot+applications.commands)
 
-### Basic Setup
+### Deploying with Docker
 
-Move the .env.example file to .env
+Copy the .env.example to the same dir and fill it out
 ```sh
-mv .env.example .env
+cp .env.example .env
 ```
 
-This bot uses the Node Package Manager (or npm for short)
+Build the image using
+```sh
+docker compose build
+```
+
+Run the container using:
+```sh
+docker compose up -d
+```
+
+Stop the container using:
+```sh
+docker compose down
+```
+
+See logs by using:
+```sh
+docker compose logs -f
+```
 
 ### p/npm:
+
+Copy the .env.example to .env as above
 
 You can replace any use of `pnpm` here with `npm`
 

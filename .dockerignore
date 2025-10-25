@@ -1,0 +1,42 @@
+# Node modules
+node_modules
+npm-debug.log
+pnpm-lock.yaml
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Build output
+dist
+
+# Git
+.git
+.gitignore
+.github
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Old files
+.old
+
+# Documentation
+readme.md
+README.md
+
+# License
+LICENCE
+LICENSE
