@@ -1,14 +1,19 @@
 import { 
     ChatInputCommandInteraction,
     ApplicationCommandType,
+    ApplicationCommandOptionType,
     InteractionContextType,
     ApplicationIntegrationType,
     RESTPostAPIChatInputApplicationCommandsJSONBody
 } from 'discord.js';
 import { IApplicationCommand } from '../core/IApplicationCommand';
 
-function calculateGayness(): number {
-    return Math.floor(Math.random() * 101);
+function calculateGayness(userId: string): number {
+    let hash = 0;
+    for (let i = 0; i < userId.length; i++) {
+        hash = userId.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return Math.abs(hash % 101);
 }
 
 const gayCounterCommand: IApplicationCommand = {
@@ -16,7 +21,14 @@ const gayCounterCommand: IApplicationCommand = {
     type: ApplicationCommandType.ChatInput,
     name: 'gaycounter',
     description: 'Find out how gay you are!',
-    options: [], 
+    options: [
+        {
+            type: ApplicationCommandOptionType.User,
+            name: 'target',
+            description: 'The user to check.',
+            required: true
+        }
+    ],
     
     contexts: [
       InteractionContextType.Guild,
@@ -32,18 +44,20 @@ const gayCounterCommand: IApplicationCommand = {
   async execute(interaction) {
     const chatInteraction = interaction as ChatInputCommandInteraction;
     
+    const targetUser = chatInteraction.options.getUser('target', true);
+    
     await chatInteraction.deferReply(); 
     
-    const gayness = calculateGayness();
+    const gayness = calculateGayness(targetUser.id);
     
     let message = '';
     
     if (gayness < 20) {
-        message = `You are **${gayness}% gay**! Keep shining! 🌈`;
+        message = `**${targetUser.username}** is **${gayness}% gay**! Keep shining! 🌈`;
     } else if (gayness <= 80) {
-        message = `You are **${gayness}% gay**! That's a good spectrum position! 😉`;
+        message = `**${targetUser.username}** is **${gayness}% gay**! That's a good spectrum position! 😉`;
     } else {
-        message = `You are **${gayness}% gay**! Congratulations, that's max gay energy! ✨`;
+        message = `**${targetUser.username}** is **${gayness}% gay**! Congratulations, that's max gay energy! ✨`;
     }
 
     await chatInteraction.editReply({ 
