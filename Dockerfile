@@ -1,5 +1,5 @@
 # Stage 1: Build
-FROM node:20-slim AS builder
+FROM node:25-slim AS builder
 
 # Install pnpm
 RUN npm install -g pnpm
@@ -20,7 +20,7 @@ COPY . .
 RUN pnpm run build
 
 # Stage 2: Production
-FROM node:20-slim
+FROM node:25-slim
 
 # Install pnpm
 RUN npm install -g pnpm
