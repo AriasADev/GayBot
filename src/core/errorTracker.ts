@@ -1,5 +1,5 @@
 import { randomBytes } from 'crypto';
-import { User, Message, PartialMessage, CommandInteraction } from 'discord.js';
+import { User, Message, PartialMessage, Interaction } from 'discord.js';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -63,7 +63,7 @@ export class ErrorTracker {
             user?: User | null;
             command?: string | null;
             message?: Message | PartialMessage | null;
-            interaction?: CommandInteraction | null;
+            interaction?: Interaction | null;
             additionalContext?: Record<string, any>;
         } = {}
     ): string {
@@ -103,6 +103,7 @@ export class ErrorTracker {
             additionalContext.interactionId = options.interaction.id;
             additionalContext.channelId = options.interaction.channelId;
             additionalContext.guildId = options.interaction.guildId;
+            additionalContext.interactionType = options.interaction.type;
         }
 
         const errorContext: ErrorContext = {
