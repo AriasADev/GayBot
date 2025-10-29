@@ -185,7 +185,10 @@ client.on('interactionCreate', async (interaction: Interaction) => {
         console.error(`Error executing command: ${interaction.commandName}. Error ID: ${errorId}`);
         
         const errorMessage = { 
-            content: `There was an error executing this command!\n\`Error ID: ${errorId}\`\n\nPlease report this to the bot administrator.`, 
+            content: `❌ **Command Error**\n\n` +
+                     `An error occurred while executing this command.\n\n` +
+                     `**Error ID:** \`${errorId}\`\n\n` +
+                     `Please report this ID to a bot administrator for assistance.`, 
             ephemeral: true 
         };
         

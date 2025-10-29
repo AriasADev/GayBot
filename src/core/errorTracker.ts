@@ -24,7 +24,7 @@ export class ErrorTracker {
     private errorLog: ErrorContext[] = [];
 
     private constructor() {
-        this.logDirectory = path.join(process.cwd(), 'logs');
+        this.logDirectory = path.join(process.cwd(), '.logs');
         this.ensureLogDirectory();
     }
 
@@ -158,23 +158,49 @@ export class ErrorTracker {
 
     private writeToFile(error: ErrorContext): void {
         try {
-            const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-            const filename = `errors-${date}.json`;
+            const filename = `${error.errorId}.txt`;
             const filepath = path.join(this.logDirectory, filename);
 
-            let existingErrors: ErrorContext[] = [];
+            // Build the formatted error content
+            let content = '';
+            content += '╔═══════════════════════════════════════════════════════════════╗\n';
+            content += `║ ERROR TRACKED: ${error.errorId}\n`;
+            content += '╠═══════════════════════════════════════════════════════════════╣\n';
+            content += `║ Timestamp: ${error.timestamp}\n`;
+            content += `║ Source: ${error.source}\n`;
             
-            // Read existing errors if file exists
-            if (fs.existsSync(filepath)) {
-                const fileContent = fs.readFileSync(filepath, 'utf-8');
-                existingErrors = JSON.parse(fileContent);
+            if (error.command) {
+                content += `║ Command: ${error.command}\n`;
             }
+            
+            if (error.user) {
+                content += `║ User: ${error.user.username} (${error.user.id})\n`;
+            }
+            
+            content += `║ Error: ${error.errorMessage}\n`;
+            content += '╠═══════════════════════════════════════════════════════════════╣\n';
+            
+            if (error.errorStack) {
+                content += '║ Stack Trace:\n';
+                const stackLines = error.errorStack.split('\n');
+                stackLines.forEach(line => {
+                    content += `║   ${line}\n`;
+                });
+            }
+            
+            if (Object.keys(error.additionalContext).length > 0) {
+                content += '║ Additional Context:\n';
+                const contextStr = JSON.stringify(error.additionalContext, null, 2);
+                const contextLines = contextStr.split('\n');
+                contextLines.forEach(line => {
+                    content += `║   ${line}\n`;
+                });
+            }
+            
+            content += '╚═══════════════════════════════════════════════════════════════╝\n';
 
-            // Append new error
-            existingErrors.push(error);
-
-            // Write back to file
-            fs.writeFileSync(filepath, JSON.stringify(existingErrors, null, 2), 'utf-8');
+            // Write to file
+            fs.writeFileSync(filepath, content, 'utf-8');
         } catch (writeError) {
             console.error('Failed to write error to file:', writeError);
         }
