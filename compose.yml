@@ -10,8 +10,8 @@ services:
     environment:
       - NODE_ENV=production
     volumes:
-      # Optional: Mount logs directory if you add logging
-      - ./logs:/app/logs
+      # Mount logs directory for error tracking
+      - ./.logs:/app/.logs
     networks:
       - bot-network
     # Resource limits (optional but recommended)
