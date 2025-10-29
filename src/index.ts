@@ -11,7 +11,10 @@ import * as dotenv from "dotenv";
 dotenv.config()
 
 import { loadCommands } from './core/deploy'; 
+import { loadInteractions } from './core/loadInteractions';
+import { loadEvents } from './core/loadEvents';
 import { IApplicationCommand } from './core/IApplicationCommand'; 
+import { IInteraction, InteractionCollection, InteractionType } from './core/IInteraction';
 import { errorTracker } from './core/errorTracker';
 
 import { KeywordChecker } from './keyword-checker';
@@ -22,6 +25,7 @@ import { ObjectAny, QueueEntry } from './types';
 
 interface CustomClient extends Client {
     commands: Collection<string, IApplicationCommand>;
+    interactions: InteractionCollection;
 }
 
 const DISCORD_TOKEN = process.env.BOT_TOKEN; 
@@ -38,6 +42,7 @@ const client = new Client({
 }) as CustomClient;
 
 client.commands = new Collection<string, IApplicationCommand>();
+client.interactions = new Collection<string, IInteraction>();
 
 
 // --- Core ---
@@ -126,7 +131,10 @@ client.once('clientReady', async () => {
     try {
         console.log(`🚀 Bot is ready! Logged in as ${client.user?.tag}`);
         
+        // Load all handlers
         await loadCommands(client);
+        await loadInteractions(client);
+        await loadEvents(client);
         
         setInterval(processReactionQueue, 1000);
     } catch (error) {
@@ -152,62 +160,135 @@ client.on('messageUpdate', (oldMessage: Message | PartialMessage, newMessage: Me
 
 
 // Handle slash command interactions
-
 client.on('interactionCreate', async (interaction: Interaction) => {
-    if (!interaction.isCommand()) return;
-    
-    const command = client.commands.get(interaction.commandName);
+    // Handle slash commands
+    if (interaction.isCommand()) {
+        const command = client.commands.get(interaction.commandName);
 
-    if (!command) {
-        console.error(`No command matching ${interaction.commandName} found in collection.`);
+        if (!command) {
+            console.error(`No command matching ${interaction.commandName} found in collection.`);
+            return;
+        }
+
+        try {
+            await command.execute(interaction);
+        } catch (error) {
+            // Build additional context
+            const additionalContext: Record<string, any> = {
+                reason: 'Command execution failed'
+            };
+            
+            // Only add options if this is a ChatInputCommandInteraction
+            if (interaction.isChatInputCommand()) {
+                additionalContext.commandOptions = interaction.options.data;
+            }
+            
+            const errorId = errorTracker.trackError(error, 'command', {
+                command: interaction.commandName,
+                interaction,
+                additionalContext
+            });
+            
+            console.error(`Error executing command: ${interaction.commandName}. Error ID: ${errorId}`);
+            
+            const errorMessage = { 
+                content: `❌ **Command Error**\n\n` +
+                         `An error occurred while executing this command.\n\n` +
+                         `**Error ID:** \`${errorId}\`\n\n` +
+                         `Please report this ID to a bot administrator for assistance.`, 
+                ephemeral: true 
+            };
+            
+            try {
+                if (interaction.replied || interaction.deferred) {
+                    await interaction.followUp(errorMessage);
+                } else {
+                    await interaction.reply(errorMessage);
+                }
+            } catch (replyError) {
+                const replyErrorId = errorTracker.trackError(replyError, 'command', {
+                    command: interaction.commandName,
+                    interaction,
+                    additionalContext: {
+                        reason: 'Failed to send error message to user',
+                        originalErrorId: errorId
+                    }
+                });
+                console.error(`Failed to send error message to user. Error ID: ${replyErrorId}`);
+            }
+        }
         return;
     }
 
-    try {
-        await command.execute(interaction);
-    } catch (error) {
-        // Build additional context
-        const additionalContext: Record<string, any> = {
-            reason: 'Command execution failed'
-        };
+    // Handle component interactions (buttons, select menus, modals, etc.)
+    if (interaction.isButton() || interaction.isAnySelectMenu() || interaction.isModalSubmit()) {
+        const customId = interaction.customId;
         
-        // Only add options if this is a ChatInputCommandInteraction
-        if (interaction.isChatInputCommand()) {
-            additionalContext.commandOptions = interaction.options.data;
-        }
+        // Find matching interaction handler
+        let matchedHandler: IInteraction | undefined;
         
-        const errorId = errorTracker.trackError(error, 'command', {
-            command: interaction.commandName,
-            interaction,
-            additionalContext
-        });
-        
-        console.error(`Error executing command: ${interaction.commandName}. Error ID: ${errorId}`);
-        
-        const errorMessage = { 
-            content: `❌ **Command Error**\n\n` +
-                     `An error occurred while executing this command.\n\n` +
-                     `**Error ID:** \`${errorId}\`\n\n` +
-                     `Please report this ID to a bot administrator for assistance.`, 
-            ephemeral: true 
-        };
-        
-        try {
-            if (interaction.replied || interaction.deferred) {
-                await interaction.followUp(errorMessage);
-            } else {
-                await interaction.reply(errorMessage);
+        for (const [key, handler] of client.interactions) {
+            if (typeof handler.customId === 'string') {
+                // Exact match
+                if (handler.customId === customId) {
+                    matchedHandler = handler;
+                    break;
+                }
+            } else if (typeof handler.customId === 'function') {
+                // Pattern match
+                if (handler.customId(customId)) {
+                    matchedHandler = handler;
+                    break;
+                }
             }
-        } catch (replyError) {
-            const replyErrorId = errorTracker.trackError(replyError, 'command', {
-                command: interaction.commandName,
+        }
+
+        if (!matchedHandler) {
+            console.warn(`No interaction handler found for customId: ${customId}`);
+            return;
+        }
+
+        try {
+            await matchedHandler.execute(interaction as InteractionType);
+        } catch (error) {
+            const errorId = errorTracker.trackError(error, 'command', {
                 interaction,
                 additionalContext: {
-                    reason: 'Failed to send error message to user',
-                    originalErrorId: errorId
+                    customId,
+                    interactionType: interaction.isButton() ? 'button' 
+                                   : interaction.isAnySelectMenu() ? 'select_menu' 
+                                   : 'modal',
+                    reason: 'Interaction handler execution failed'
                 }
             });
-            console.error(`Failed to send error message to user. Error ID: ${replyErrorId}`);
+            
+            console.error(`Error executing interaction handler for ${customId}. Error ID: ${errorId}`);
+            
+            const errorMessage = { 
+                content: `❌ **Interaction Error**\n\n` +
+                         `An error occurred while processing this interaction.\n\n` +
+                         `**Error ID:** \`${errorId}\`\n\n` +
+                         `Please report this ID to a bot administrator for assistance.`, 
+                ephemeral: true 
+            };
+            
+            try {
+                if (interaction.replied || interaction.deferred) {
+                    await interaction.followUp(errorMessage);
+                } else {
+                    await interaction.reply(errorMessage);
+                }
+            } catch (replyError) {
+                const replyErrorId = errorTracker.trackError(replyError, 'command', {
+                    interaction,
+                    additionalContext: {
+                        customId,
+                        reason: 'Failed to send error message to user',
+                        originalErrorId: errorId
+                    }
+                });
+                console.error(`Failed to send error message to user. Error ID: ${replyErrorId}`);
+            }
         }
     }
 });
