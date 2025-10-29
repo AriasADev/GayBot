@@ -12,11 +12,12 @@ dotenv.config()
 
 import { loadCommands } from './core/deploy'; 
 import { IApplicationCommand } from './core/IApplicationCommand'; 
+import { errorTracker } from './core/errorTracker';
 
 import { KeywordChecker } from './keyword-checker';
 import { ObjectAny, QueueEntry } from './types';
 
-// --- Configuration and Setup --
+// --- Configuration and Setup ---
 
 
 interface CustomClient extends Client {
@@ -45,28 +46,44 @@ const reactionQueue: QueueEntry[] = [];
 let isProcessingQueue = false;
 
 async function handleMessageKeywords(message: Message | PartialMessage) {
-    if (message.partial) {
-        try {
-            message = await message.fetch();
-        } catch (error) {
-            console.error('Could not fetch partial message for content check:', error);
-            return; 
+    try {
+        if (message.partial) {
+            try {
+                message = await message.fetch();
+            } catch (error) {
+                const errorId = errorTracker.trackError(error, 'messageUpdate', {
+                    message,
+                    additionalContext: {
+                        reason: 'Failed to fetch partial message'
+                    }
+                });
+                console.error(`Could not fetch partial message. Error ID: ${errorId}`);
+                return; 
+            }
         }
-    }
-    
-    if (!message.content || message.author.bot) return;
-
-    const matchingEmojis = keywordChecker.getMatchingEmojis(message.content);
-
-    if (matchingEmojis.length > 0) {
-        console.log(`Keywords matched in message ID ${message.id}. Emojis: ${matchingEmojis.join(', ')}`);
         
-        for (const emoji of matchingEmojis) {
-            reactionQueue.push({
-                message: message,
-                emoji: emoji
-            });
+        if (!message.content || message.author.bot) return;
+
+        const matchingEmojis = keywordChecker.getMatchingEmojis(message.content);
+
+        if (matchingEmojis.length > 0) {
+            console.log(`Keywords matched in message ID ${message.id}. Emojis: ${matchingEmojis.join(', ')}`);
+            
+            for (const emoji of matchingEmojis) {
+                reactionQueue.push({
+                    message: message,
+                    emoji: emoji
+                });
+            }
         }
+    } catch (error) {
+        const errorId = errorTracker.trackError(error, 'messageCreate', {
+            message,
+            additionalContext: {
+                reason: 'Error in handleMessageKeywords'
+            }
+        });
+        console.error(`Error handling message keywords. Error ID: ${errorId}`);
     }
 }
 
@@ -86,7 +103,14 @@ async function processReactionQueue() {
             
             await message.react(entry.emoji);
         } catch (error) {
-            console.error(`Error reacting with ${entry.emoji}:`, error);
+            const errorId = errorTracker.trackError(error, 'reaction', {
+                message: entry.message,
+                additionalContext: {
+                    emoji: entry.emoji,
+                    reason: 'Failed to add reaction'
+                }
+            });
+            console.error(`Error reacting with ${entry.emoji}. Error ID: ${errorId}`);
         }
     }
 
@@ -99,11 +123,21 @@ async function processReactionQueue() {
 // --- Discord Event Handlers ---
 
 client.once('clientReady', async () => {
-    console.log(`🚀 Bot is ready! Logged in as ${client.user?.tag}`);
-    
-    await loadCommands(client);
-    
-    setInterval(processReactionQueue, 1000); 
+    try {
+        console.log(`🚀 Bot is ready! Logged in as ${client.user?.tag}`);
+        
+        await loadCommands(client);
+        
+        setInterval(processReactionQueue, 1000);
+    } catch (error) {
+        const errorId = errorTracker.trackError(error, 'startup', {
+            additionalContext: {
+                reason: 'Error during bot startup'
+            }
+        });
+        console.error(`Error during startup. Error ID: ${errorId}`);
+        process.exit(1);
+    }
 });
 
 
@@ -132,24 +166,65 @@ client.on('interactionCreate', async (interaction: Interaction) => {
     try {
         await command.execute(interaction);
     } catch (error) {
-        console.error('Error executing command:', error);
+        // Build additional context
+        const additionalContext: Record<string, any> = {
+            reason: 'Command execution failed'
+        };
         
-        const errorMessage = { content: 'There was an error executing this command!', ephemeral: true };
+        // Only add options if this is a ChatInputCommandInteraction
+        if (interaction.isChatInputCommand()) {
+            additionalContext.commandOptions = interaction.options.data;
+        }
         
-        if (interaction.replied || interaction.deferred) {
-            await interaction.followUp(errorMessage);
-        } else {
-            await interaction.reply(errorMessage);
+        const errorId = errorTracker.trackError(error, 'command', {
+            command: interaction.commandName,
+            interaction,
+            additionalContext
+        });
+        
+        console.error(`Error executing command: ${interaction.commandName}. Error ID: ${errorId}`);
+        
+        const errorMessage = { 
+            content: `There was an error executing this command!\n\`Error ID: ${errorId}\`\n\nPlease report this to the bot administrator.`, 
+            ephemeral: true 
+        };
+        
+        try {
+            if (interaction.replied || interaction.deferred) {
+                await interaction.followUp(errorMessage);
+            } else {
+                await interaction.reply(errorMessage);
+            }
+        } catch (replyError) {
+            const replyErrorId = errorTracker.trackError(replyError, 'command', {
+                command: interaction.commandName,
+                interaction,
+                additionalContext: {
+                    reason: 'Failed to send error message to user',
+                    originalErrorId: errorId
+                }
+            });
+            console.error(`Failed to send error message to user. Error ID: ${replyErrorId}`);
         }
     }
 });
 
 
 client.on('error', (error) => {
-    console.error('A client error occurred:', error);
+    const errorId = errorTracker.trackError(error, 'unknown', {
+        additionalContext: {
+            reason: 'Discord client error event'
+        }
+    });
+    console.error(`A client error occurred. Error ID: ${errorId}`);
 });
 
 
 client.login(DISCORD_TOKEN).catch(err => {
-    console.error("Failed to login to Discord. Check your BOT_TOKEN.", err);
+    const errorId = errorTracker.trackError(err, 'startup', {
+        additionalContext: {
+            reason: 'Failed to login to Discord. Check your BOT_TOKEN.'
+        }
+    });
+    console.error(`Failed to login to Discord. Error ID: ${errorId}`);
 });
