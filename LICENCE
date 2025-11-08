@@ -1,21 +1,112 @@
-MIT License
+GNU NonCommercial General Public License v3.0 (NC-GPL-3.0)
+==========================================================
 
-Copyright (c) 2025 AriaADev
+This is a modified version of the GNU General Public License version 3 (GPLv3).
+It is **not** approved by or affiliated with the Free Software Foundation.
+This license preserves the freedom to use, study, and modify the software
+for personal and non-commercial purposes only.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+---------------------------------------------------------------------
+Preamble
+---------------------------------------------------------------------
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+The GNU NonCommercial General Public License (NC-GPL) is intended to guarantee
+your freedom to share and change free software for **non-commercial use** —
+to make sure the software is free for all its personal and educational users.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+You can use, modify, and share this software freely, provided that you
+do not use it for commercial purposes or for monetary gain.
+
+---------------------------------------------------------------------
+TERMS AND CONDITIONS
+---------------------------------------------------------------------
+
+0. Definitions
+--------------
+
+- “This License” refers to version 3 of the GNU NonCommercial General Public License.
+- “Program” refers to any work licensed under this License.
+- “Commercial use” means use of the Program that is intended for or directed toward
+  **commercial advantage or monetary compensation**.
+- “Personal use” means private, educational, research, or hobbyist use by an
+  individual or non-profit organization.
+
+1. Permissions
+--------------
+
+You are permitted to:
+
+- Use and run the Program for personal and non-commercial purposes.
+- Copy and distribute verbatim copies of the Program’s source code,
+  provided you include this license and copyright notice.
+- Modify the Program, and distribute your modified version under this
+  same license (NC-GPL-3.0), provided that:
+  - You clearly state that you modified the file(s).
+  - You do not charge a fee or receive monetary compensation.
+  - The Program remains under this same license.
+
+2. Prohibitions
+---------------
+
+You may **NOT**:
+
+- Use the Program or derivative works for **commercial purposes**, including but
+  not limited to:
+  - Selling the software or any portion thereof.
+  - Using the software in commercial products or services.
+  - Hosting or offering the software as a paid or ad-supported service.
+- Re-license this work under the standard GNU GPL or other licenses that permit
+  commercial use.
+- Combine or distribute this Program with works under GPL or other open source
+  licenses in a way that would make the combined work usable for commercial purposes.
+
+3. Attribution
+--------------
+
+If you distribute or publicly use this Program or a modified version, you must:
+
+- Provide appropriate credit to the original author(s).
+- Include a clear and visible link to the original source repository where
+  the Program was obtained (for example, in your README or about page).
+- Include a copy of this license.
+
+4. No Warranty
+--------------
+
+THIS SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR
+OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR
+THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+5. License Compatibility
+------------------------
+
+This license is **not compatible** with the GNU GPL or other open-source
+licenses that allow commercial use. Works licensed under this license
+cannot be combined or distributed with works under such licenses.
+
+6. Applying This License
+------------------------
+
+To apply this license to your work, attach the following notice
+to each source file or in an appropriate location in your project:
+
+    Copyright (C) 2025 Aria Rees (https://github.com/AriasADev)
+    
+    This program is free software: you may use, modify, and redistribute it
+    under the terms of the GNU NonCommercial General Public License, version 3.
+    
+    This program may NOT be used for commercial purposes.
+    
+    You must include a clear and visible link to the original repository
+    where this program was obtained.
+    
+    You should have received a copy of the GNU NonCommercial General Public License
+    along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+---------------------------------------------------------------------
+END OF TERMS AND CONDITIONS
+---------------------------------------------------------------------
