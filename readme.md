@@ -65,3 +65,6 @@ pnpm run build:watch
 <a href="https://github.com/AriasADev/GayBot/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=AriasADev/GayBot" />
 </a>
+
+# 📜 License: GNU NC-GPL v3 — non-commercial use only.  
+> See [LICENSE](./LICENSE) for details.
