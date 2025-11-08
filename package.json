@@ -20,6 +20,7 @@
     "dependencies": {
         "discord.js": "^14.24.0",
         "dotenv": "^17.2.3",
+        "node-fetch": "^3.3.2",
         "nodemon": "^3.1.10"
     }
 }
