@@ -11,9 +11,10 @@ updates:
       timezone: "UTC"
     open-pull-requests-limit: 5
     reviewers:
-      - "AriasADev"
+      - "CloveTwilight3"
     assignees:
       - "AriasADev"
+      - "CloveTwilight3"
     commit-message:
       prefix: "npm"
       include: "scope"
@@ -45,9 +46,10 @@ updates:
       timezone: "UTC"
     open-pull-requests-limit: 2
     reviewers:
-      - "AriasADev"
+      - "CloveTwilight3"
     assignees:
       - "AriasADev"
+      - "CloveTwilight3"
     commit-message:
       prefix: "docker"
     labels:
@@ -65,7 +67,10 @@ updates:
       timezone: "UTC"
     open-pull-requests-limit: 2
     reviewers:
+      - "CloveTwilight3"
+    assignees:
       - "AriasADev"
+      - "CloveTwilight3"
     commit-message:
       prefix: "ci"
     labels:
