@@ -66,5 +66,5 @@ pnpm run build:watch
   <img src="https://contrib.rocks/image?repo=AriasADev/GayBot" />
 </a>
 
-# 📜 License: GNU NC-GPL v3 — non-commercial use only.  
-> See [LICENSE](./LICENSE) for details.
+# 📜 Licence: GNU NC-GPL v3 — non-commercial use only.  
+> See [LICENCE](./LICENCE) for details.
