@@ -62,8 +62,8 @@ pnpm run build:watch
 ```
 
 ### Contributors
-<a href="https://github.com/AriasADev/GayBot/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=AriasADev/GayBot" />
+<a href="https://github.com/Girls-Development-Team/GayBot/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Girls-Development-Team/GayBot" />
 </a>
 
 # 📜 Licence: GNU NC-GPL v3 — non-commercial use only.  
