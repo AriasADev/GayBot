@@ -1,4 +1,4 @@
-import { EmojiMapEntry } from './types';
+import { EmojiMapEntry } from '../types';
 import * as config from './emoji-config.json';
 
 const importedConfig = config as any;

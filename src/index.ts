@@ -1,314 +1,121 @@
-import { 
-    Client, 
-    GatewayIntentBits, 
-    Partials, 
-    Message, 
-    PartialMessage, 
-    Interaction, 
-    Collection 
-} from 'discord.js';
-import * as dotenv from "dotenv";
-dotenv.config()
+import * as dotenv from 'dotenv';
+dotenv.config();
 
-import { loadCommands } from './core/deploy'; 
-import { loadInteractions } from './core/loadInteractions';
+
+import { Client, GatewayIntentBits, Collection, Partials } from 'discord.js';
+import { CustomClient } from './types';
+import { errorTracker } from './core/errorTracker'; 
 import { loadEvents } from './core/loadEvents';
-import { IApplicationCommand } from './core/IApplicationCommand'; 
-import { IInteraction, InteractionCollection, InteractionType } from './core/IInteraction';
-import { errorTracker } from './core/errorTracker';
-
-import { KeywordChecker } from './keyword-checker';
-import { ObjectAny, QueueEntry } from './types';
-
-// --- Configuration and Setup ---
+import { loadInteractions } from './core/loadInteractions';
+import { loadCommands } from './core/loadCommands'; 
+import { deployCommands } from './core/deploy'; 
+import { ACTIVITIES } from './config';
+import { KeywordChecker } from './utils/keyword-checker'; 
+import { processReactionQueue } from './utils/reactionQueueProcessor';
 
 
-interface CustomClient extends Client {
-    commands: Collection<string, IApplicationCommand>;
-    interactions: InteractionCollection;
-}
-
-const DISCORD_TOKEN = process.env.BOT_TOKEN; 
-
-const keywordChecker = new KeywordChecker();
-
+// LABEL: CLIENT INITIALIZATION
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.MessageContent, 
+        GatewayIntentBits.GuildMembers,
     ],
-    partials: [Partials.Message, Partials.Channel],
+    partials: [Partials.Channel, Partials.Message, Partials.Reaction, Partials.GuildMember]
 }) as CustomClient;
 
-client.commands = new Collection<string, IApplicationCommand>();
-client.interactions = new Collection<string, IInteraction>();
+// LABEL: CUSTOM CLIENT PROPERTIES
 
+// --- Mandatory Base Properties ---
+client.commands = new Collection();
+client.interactions = new Collection();
+client.errorTracker = errorTracker;
+client.interactionQueue = new Collection(); 
+client.keywordChecker = new KeywordChecker();
+client.reactionQueue = []; 
 
-// --- Core ---
+// --- Core Handlers Setup ---
 
-const reactionQueue: QueueEntry[] = [];
-let isProcessingQueue = false;
+// LABEL: Slash Command Execution Handler
+client.on('interactionCreate', async interaction => {
+    if (!interaction.isChatInputCommand()) return;
 
-async function handleMessageKeywords(message: Message | PartialMessage) {
+    const command = client.commands.get(interaction.commandName);
+    if (!command) return;
+
     try {
-        if (message.partial) {
+        await command.execute(interaction, client); 
+    } catch (error) {
+        const errorId = client.errorTracker.trackError(error, 'command');
+        console.error(`Error executing command ${interaction.commandName} (ID: ${errorId})`);
+        
+        const errorMessage = `An internal error occurred while running the command (ID: ${errorId}).`;
+        if (interaction.deferred || interaction.replied) {
+            await interaction.editReply({ content: errorMessage }).catch(() => {});
+        } else {
+            await interaction.reply({ content: errorMessage, ephemeral: true }).catch(() => {});
+        }
+    }
+});
+
+// LABEL: Component Interaction Execution Handler
+client.on('interactionCreate', async interaction => {
+    if (!interaction.isMessageComponent() && !interaction.isModalSubmit()) return;
+
+    let executed = false;
+    for (const handler of client.interactions.values()) {
+        const customIdMatch = typeof handler.customId === 'string'
+            ? handler.customId === interaction.customId
+            : handler.customId(interaction.customId);
+
+        if (customIdMatch) {
             try {
-                message = await message.fetch();
+                await handler.execute(interaction, client); 
+                executed = true;
+                break;
             } catch (error) {
-                const errorId = errorTracker.trackError(error, 'messageUpdate', {
-                    message,
-                    additionalContext: {
-                        reason: 'Failed to fetch partial message'
-                    }
-                });
-                console.error(`Could not fetch partial message. Error ID: ${errorId}`);
-                return; 
-            }
-        }
-        
-        if (!message.content || message.author.bot) return;
-
-        const matchingEmojis = keywordChecker.getMatchingEmojis(message.content);
-
-        if (matchingEmojis.length > 0) {
-            console.log(`Keywords matched in message ID ${message.id}. Emojis: ${matchingEmojis.join(', ')}`);
-            
-            for (const emoji of matchingEmojis) {
-                reactionQueue.push({
-                    message: message,
-                    emoji: emoji
-                });
-            }
-        }
-    } catch (error) {
-        const errorId = errorTracker.trackError(error, 'messageCreate', {
-            message,
-            additionalContext: {
-                reason: 'Error in handleMessageKeywords'
-            }
-        });
-        console.error(`Error handling message keywords. Error ID: ${errorId}`);
-    }
-}
-
-
-async function processReactionQueue() {
-    if (isProcessingQueue || reactionQueue.length === 0) {
-        return;
-    }
-
-    isProcessingQueue = true;
-    const entry = reactionQueue.shift();
-    
-    if (entry) {
-        try {
-            console.log(`Reacting with ${entry.emoji} to message ID ${entry.message.id}`);
-            const message = await entry.message.fetch();
-            
-            await message.react(entry.emoji);
-        } catch (error) {
-            const errorId = errorTracker.trackError(error, 'reaction', {
-                message: entry.message,
-                additionalContext: {
-                    emoji: entry.emoji,
-                    reason: 'Failed to add reaction'
+                const errorId = client.errorTracker.trackError(error, 'unknown'); 
+                console.error(`Error executing interaction ${interaction.customId} (ID: ${errorId})`);
+                
+                const errorMessage = `An internal error occurred during the interaction (ID: ${errorId}).`;
+                if (interaction.deferred || interaction.replied) {
+                    await interaction.editReply({ content: errorMessage }).catch(() => {});
+                } else {
+                    await interaction.reply({ content: errorMessage, ephemeral: true }).catch(() => {});
                 }
-            });
-            console.error(`Error reacting with ${entry.emoji}. Error ID: ${errorId}`);
+            }
         }
     }
+});
 
-    isProcessingQueue = false;
-    if (reactionQueue.length > 0) {
-        setTimeout(processReactionQueue, 500); 
-    }
-}
 
-// --- Discord Event Handlers ---
+// --- Initialization Sequence ---
 
-client.once('clientReady', async () => {
+async function startBot() {
     try {
-        console.log(`🚀 Bot is ready! Logged in as ${client.user?.tag}`);
         
-        // Load all handlers
-        await loadCommands(client);
-        await loadInteractions(client);
-        await loadEvents(client);
+        // LABEL: Handler Loading
+        await loadCommands(client); 
+        await loadEvents(client); 
+        await loadInteractions(client); 
+
+        await deployCommands(client); 
         
-        setInterval(processReactionQueue, 1000);
+        // LABEL: Reaction Queue Processing Start
+        setInterval(() => processReactionQueue(client), 1000); 
+
+        // LABEL: Set Initial Presence
+        client.user?.setActivity(ACTIVITIES[0].name, { type: ACTIVITIES[0].type });
+
+        await client.login(process.env.BOT_TOKEN);
+        console.log('[SUCCESS] Bot Client Logged In.');
+
     } catch (error) {
-        const errorId = errorTracker.trackError(error, 'startup', {
-            additionalContext: {
-                reason: 'Error during bot startup'
-            }
-        });
-        console.error(`Error during startup. Error ID: ${errorId}`);
+        const errorId = errorTracker.trackError(error, 'startup');
+        console.error(`[ERROR] Fatal Bot Startup Error (ID: ${errorId})`);
         process.exit(1);
     }
-});
+}
 
-
-client.on('messageCreate', (message: Message) => {
-    handleMessageKeywords(message);
-});
-
-
-client.on('messageUpdate', (oldMessage: Message | PartialMessage, newMessage: Message | PartialMessage) => {
-    handleMessageKeywords(newMessage);
-});
-
-
-// Handle slash command interactions
-client.on('interactionCreate', async (interaction: Interaction) => {
-    // Handle slash commands
-    if (interaction.isCommand()) {
-        const command = client.commands.get(interaction.commandName);
-
-        if (!command) {
-            console.error(`No command matching ${interaction.commandName} found in collection.`);
-            return;
-        }
-
-        try {
-            await command.execute(interaction);
-        } catch (error) {
-            // Build additional context
-            const additionalContext: Record<string, any> = {
-                reason: 'Command execution failed'
-            };
-            
-            // Only add options if this is a ChatInputCommandInteraction
-            if (interaction.isChatInputCommand()) {
-                additionalContext.commandOptions = interaction.options.data;
-            }
-            
-            const errorId = errorTracker.trackError(error, 'command', {
-                command: interaction.commandName,
-                interaction,
-                additionalContext
-            });
-            
-            console.error(`Error executing command: ${interaction.commandName}. Error ID: ${errorId}`);
-            
-            const errorMessage = { 
-                content: `❌ **Command Error**\n\n` +
-                         `An error occurred while executing this command.\n\n` +
-                         `**Error ID:** \`${errorId}\`\n\n` +
-                         `Please report this ID to a bot administrator for assistance.`, 
-                ephemeral: true 
-            };
-            
-            try {
-                if (interaction.replied || interaction.deferred) {
-                    await interaction.followUp(errorMessage);
-                } else {
-                    await interaction.reply(errorMessage);
-                }
-            } catch (replyError) {
-                const replyErrorId = errorTracker.trackError(replyError, 'command', {
-                    command: interaction.commandName,
-                    interaction,
-                    additionalContext: {
-                        reason: 'Failed to send error message to user',
-                        originalErrorId: errorId
-                    }
-                });
-                console.error(`Failed to send error message to user. Error ID: ${replyErrorId}`);
-            }
-        }
-        return;
-    }
-
-    // Handle component interactions (buttons, select menus, modals, etc.)
-    if (interaction.isButton() || interaction.isAnySelectMenu() || interaction.isModalSubmit()) {
-        const customId = interaction.customId;
-        
-        // Find matching interaction handler
-        let matchedHandler: IInteraction | undefined;
-        
-        for (const [key, handler] of client.interactions) {
-            if (typeof handler.customId === 'string') {
-                // Exact match
-                if (handler.customId === customId) {
-                    matchedHandler = handler;
-                    break;
-                }
-            } else if (typeof handler.customId === 'function') {
-                // Pattern match
-                if (handler.customId(customId)) {
-                    matchedHandler = handler;
-                    break;
-                }
-            }
-        }
-
-        if (!matchedHandler) {
-            console.warn(`No interaction handler found for customId: ${customId}`);
-            return;
-        }
-
-        try {
-            await matchedHandler.execute(interaction as InteractionType);
-        } catch (error) {
-            const errorId = errorTracker.trackError(error, 'command', {
-                interaction,
-                additionalContext: {
-                    customId,
-                    interactionType: interaction.isButton() ? 'button' 
-                                   : interaction.isAnySelectMenu() ? 'select_menu' 
-                                   : 'modal',
-                    reason: 'Interaction handler execution failed'
-                }
-            });
-            
-            console.error(`Error executing interaction handler for ${customId}. Error ID: ${errorId}`);
-            
-            const errorMessage = { 
-                content: `❌ **Interaction Error**\n\n` +
-                         `An error occurred while processing this interaction.\n\n` +
-                         `**Error ID:** \`${errorId}\`\n\n` +
-                         `Please report this ID to a bot administrator for assistance.`, 
-                ephemeral: true 
-            };
-            
-            try {
-                if (interaction.replied || interaction.deferred) {
-                    await interaction.followUp(errorMessage);
-                } else {
-                    await interaction.reply(errorMessage);
-                }
-            } catch (replyError) {
-                const replyErrorId = errorTracker.trackError(replyError, 'command', {
-                    interaction,
-                    additionalContext: {
-                        customId,
-                        reason: 'Failed to send error message to user',
-                        originalErrorId: errorId
-                    }
-                });
-                console.error(`Failed to send error message to user. Error ID: ${replyErrorId}`);
-            }
-        }
-    }
-});
-
-
-client.on('error', (error) => {
-    const errorId = errorTracker.trackError(error, 'unknown', {
-        additionalContext: {
-            reason: 'Discord client error event'
-        }
-    });
-    console.error(`A client error occurred. Error ID: ${errorId}`);
-});
-
-
-client.login(DISCORD_TOKEN).catch(err => {
-    const errorId = errorTracker.trackError(err, 'startup', {
-        additionalContext: {
-            reason: 'Failed to login to Discord. Check your BOT_TOKEN.'
-        }
-    });
-    console.error(`Failed to login to Discord. Error ID: ${errorId}`);
-});
+startBot();

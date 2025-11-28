@@ -1,32 +1,30 @@
 import {
-  Collection,
-  ButtonInteraction,
-  StringSelectMenuInteraction,
-  UserSelectMenuInteraction,
-  RoleSelectMenuInteraction,
-  ChannelSelectMenuInteraction,
-  MentionableSelectMenuInteraction,
-  ModalSubmitInteraction,
-  AnySelectMenuInteraction,
+  Collection,
+  ButtonInteraction,
+  StringSelectMenuInteraction,
+  UserSelectMenuInteraction,
+  RoleSelectMenuInteraction,
+  ChannelSelectMenuInteraction,
+  MentionableSelectMenuInteraction,
+  ModalSubmitInteraction,
+  AnySelectMenuInteraction,
 } from 'discord.js';
+import { CustomClient } from '../types'; 
 
 export type InteractionType =
-  | ButtonInteraction
-  | StringSelectMenuInteraction
-  | UserSelectMenuInteraction
-  | RoleSelectMenuInteraction
-  | ChannelSelectMenuInteraction
-  | MentionableSelectMenuInteraction
-  | ModalSubmitInteraction
-  | AnySelectMenuInteraction;
+  | ButtonInteraction
+  | StringSelectMenuInteraction
+  | UserSelectMenuInteraction
+  | RoleSelectMenuInteraction
+  | ChannelSelectMenuInteraction
+  | MentionableSelectMenuInteraction
+  | ModalSubmitInteraction
+  | AnySelectMenuInteraction;
 
 export interface IInteraction {
-  // The custom ID that this interaction responds to
-  // Can be exact match or a function for pattern matching
-  customId: string | ((customId: string) => boolean);
-  
-  // Execute function that handles the interaction
-  execute: (interaction: InteractionType) => Promise<void>;
+  customId: string | ((customId: string) => boolean);
+  
+execute: (interaction: InteractionType, client: CustomClient) => Promise<any>;
 }
 
 export type InteractionCollection = Collection<string, IInteraction>;
