@@ -12,7 +12,7 @@ export interface IApplicationCommand {
 
     data: RESTPostAPIApplicationCommandsJSONBody;
     
-    permissions: 'user' | 'admin'; 
+    permissions: 'user' | 'admin'| 'developer'; 
     defaultMemberPermissions?: PermissionResolvable; 
 
     // This line is correct and defines two expected arguments: 'interaction' and 'client'.
