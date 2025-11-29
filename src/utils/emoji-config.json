@@ -38,5 +38,10 @@
         "emoji": "<:girl_gotobed:1429282327334355047>",
         "title": "Tired",
         "keywords": ["tired", "sleepy", "eepy", "bed", "nappy", "snooze", "exhausted", "zzz", "eepers"]
+    },
+    {
+        "emoji": "<:girl_mikuBwaa:1419503673230495756>",
+        "title": "Miku",
+        "keywords": ["miku", "hatsune", "vocaloid", "leek"]
     }
 ]
