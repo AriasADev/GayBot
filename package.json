@@ -5,7 +5,7 @@
     "main": "dist/index.js",
     "keywords": [],
     "author": "REfurbished By: Lemi the photographer, OG: MeltyMooncakes and AriasADev",
-    "license": "ISC",
+    "license": "GPL-3.0-only",
     "scripts": {
         "test": "npm run build && node dist/index.js",
         "build": "tsc",
@@ -14,7 +14,7 @@
         "dev": "nodemon --watch src --ext ts --exec \"npm run build && npm run start\""
     },
     "devDependencies": {
-        "@types/node": "^24.10.1",
+        "@types/node": "^25.0.2",
         "typescript": "^5.9.3"
     },
     "dependencies": {
