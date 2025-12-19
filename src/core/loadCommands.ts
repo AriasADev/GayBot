@@ -1,26 +1,26 @@
-// src/core/loadCommands.ts (SUBCOMMAND MERGING SUPPORT)
+// src/core/loadCommands.ts
 
-import { Collection } from 'discord.js';
+import { Collection, CommandInteraction, ApplicationCommandOptionType } from 'discord.js';
 import { CustomClient } from '../types';
 import * as fs from 'fs'; 
 import * as path from 'path'; 
 import { errorTracker } from './errorTracker';
 import { IApplicationCommand } from './IApplicationCommand';
 
+// Extended interface to support the hidden handler map
+interface IExtendedCommand extends IApplicationCommand {
+    _subcommandMap?: Map<string, Function>;
+}
+
 /**
  * Recursively scans a directory for .js files
- * @param dirPath The directory to scan
- * @returns Array of absolute file paths to all .js files
  */
 const getAllJsFiles = (dirPath: string): string[] => {
     const jsFiles: string[] = [];
-    
     try {
         const entries = fs.readdirSync(dirPath, { withFileTypes: true });
-        
         for (const entry of entries) {
             const fullPath = path.join(dirPath, entry.name);
-            
             if (entry.isDirectory()) {
                 jsFiles.push(...getAllJsFiles(fullPath));
             } else if (entry.isFile() && entry.name.endsWith('.js')) {
@@ -30,143 +30,158 @@ const getAllJsFiles = (dirPath: string): string[] => {
     } catch (error) {
         console.error(`❌ Error reading directory ${dirPath}:`, error);
     }
-    
     return jsFiles;
 };
 
 /**
- * Merges subcommands from multiple command files into a single command
+ * Merges subcommands using a Router strategy.
+ * It maps subcommand names to the specific execute function from their source file.
  */
-const mergeSubcommands = (existing: IApplicationCommand, incoming: IApplicationCommand, filePath: string): boolean => {
-    // Check if incoming command has subcommands or subcommand groups
+const mergeSubcommands = (existing: IExtendedCommand, incoming: IApplicationCommand, filePath: string): boolean => {
     const incomingOptions = incoming.data.options || [];
-    
+
+    // 1. Validation: Ensure we have subcommands to merge
     if (incomingOptions.length === 0) {
-        console.warn(`⚠️  ${filePath} has no subcommands to merge`);
+        console.warn(`⚠️  ${filePath} has no subcommands to merge.`);
         return false;
     }
-    
-    // Initialize options array if it doesn't exist
-    if (!existing.data.options) {
-        existing.data.options = [];
+
+    // 2. Initialize the Router Map on the existing command if it's the first merge
+    if (!existing._subcommandMap) {
+        existing._subcommandMap = new Map();
+
+        // If the 'existing' command had subcommands, map them to its own execute function
+        if (existing.data.options) {
+            existing.data.options.forEach((opt: any) => {
+                // Only map explicit Subcommands (Type 1)
+                if (opt.type === ApplicationCommandOptionType.Subcommand) {
+                    existing._subcommandMap!.set(opt.name, existing.execute);
+                }
+            });
+        }
     }
-    
+
+    // 3. Merge Incoming Data
+    if (!existing.data.options) existing.data.options = [];
+
     let mergedCount = 0;
-    
-    // Merge each subcommand/subcommand group
+
     for (const option of incomingOptions) {
-        // Check for duplicate subcommands
-        const existingOption = existing.data.options.find(
-            (opt: any) => opt.name === option.name
-        );
-        
-        if (existingOption) {
-            console.warn(`⚠️  Subcommand '${option.name}' already exists in '${existing.data.name}' - skipping from ${filePath}`);
+        // Prevent overwriting existing subcommands
+        if (existing.data.options.some((opt: any) => opt.name === option.name)) {
+            console.warn(`⚠️  Subcommand '${option.name}' collision in '${existing.data.name}'. Skipping version from ${filePath}.`);
             continue;
         }
-        
+
+        // Add the option structure
         existing.data.options.push(option);
-        mergedCount++;
-    }
-    
-    // Merge execute handlers if they exist
-    if (incoming.execute && typeof incoming.execute === 'function') {
-        const originalExecute = existing.execute;
         
-        // Create a wrapper that tries both execute functions
-        // FIX: Added 'client: any' argument to the execute wrapper function
-        existing.execute = async (interaction: any, client: any) => {
-            try {
-                // Try the original execute first
-                if (originalExecute) {
-                    // FIX: Pass 'client' to the originalExecute call
-                    await originalExecute(interaction, client);
-                }
-            } catch (error) {
-                // If original doesn't handle it, try the incoming one
-                if (incoming.execute) {
-                    // FIX: Pass 'client' to the incoming.execute call
-                    await incoming.execute(interaction, client);
-                } else {
-                    throw error;
-                }
-            }
-        };
+        // Register the handler: This subcommand name -> This file's execute function
+        if (option.type === ApplicationCommandOptionType.Subcommand) {
+            existing._subcommandMap.set(option.name, incoming.execute);
+            mergedCount++;
+        }
     }
-    
+
+    // 4. Create (or Update) the Routing Execute Function
+    // This replaces the standard execute with one that checks which subcommand was used
+    existing.execute = async (interaction: CommandInteraction, client: CustomClient) => {
+        try {
+            // Identify which subcommand was triggered
+            // Note: This requires the interaction to be an option-capable interaction
+            if (!interaction.isChatInputCommand()) return;
+
+            const subCommandName = interaction.options.getSubcommand(false);
+
+            if (subCommandName && existing._subcommandMap?.has(subCommandName)) {
+                // ✅ ROUTING: Call the specific function for this subcommand
+                const handler = existing._subcommandMap.get(subCommandName);
+                if (handler) {
+                    await handler(interaction, client);
+                }
+            } else {
+                // Fallback: If no subcommand matched (or it's a top-level command), try standard execution
+                // This covers cases where logic isn't strictly inside the map
+                console.warn(`⚠️  No specific handler found for subcommand '${subCommandName}' on '${existing.data.name}'`);
+                await interaction.reply({ content: "❌ Subcommand handler missing.", ephemeral: true });
+            }
+        } catch (error) {
+            // Let the main error tracker handle the crash, but log context
+            console.error(`Error in merged command router for ${existing.data.name}:`, error);
+            throw error;
+        }
+    };
+
     return mergedCount > 0;
 };
 
 /**
- * Dynamically loads all application commands from the compiled 'dist/commands' directory.
- * Supports nested subfolders and merges subcommands from multiple files!
- * @param client The bot client instance.
+ * Main Loader Function
  */
 export const loadCommands = async (client: CustomClient) => {
     client.commands = new Collection();
-    
     const commandsBasePath = path.join(process.cwd(), 'dist', 'commands'); 
-    let loadedCount = 0;
-    let mergedCount = 0;
-    let skippedCount = 0;
-    let errorCount = 0;
+    
+    // Stats counters
+    const stats = { loaded: 0, merged: 0, skipped: 0, errors: 0 };
 
-    console.log(`[SCAN] Scanning for commands in: ${commandsBasePath}`);
+    console.log(`📂 Scanning for commands in: ${commandsBasePath}`);
 
     try {
         const allCommandFiles = getAllJsFiles(commandsBasePath);
-        
-        console.log(`[LOAD] ${allCommandFiles.length} command file(s) to process...`);
+        console.log(`📄 Found ${allCommandFiles.length} command file(s)...`);
 
         for (const filePath of allCommandFiles) {
             const relativePath = path.relative(commandsBasePath, filePath);
             
             try {
-                const commandModule = require(filePath); 
-                const command: IApplicationCommand = commandModule.default || commandModule; 
+                // Clear require cache for hot-reloading support (optional but good for dev)
+                delete require.cache[require.resolve(filePath)];
 
-                if (command && command.data && command.data.name) { 
-                    const existingCommand = client.commands.get(command.data.name);
-                    
-                    if (existingCommand) {
-                        // Try to merge subcommands
-                        const merged = mergeSubcommands(existingCommand, command, relativePath);
-                        
-                        if (merged) {
-                            console.log(`🔗 Merged subcommands from ${relativePath} into '${command.data.name}'`);
-                            mergedCount++;
-                        } else {
-                            console.warn(`⚠️  Duplicate command '${command.data.name}' in ${relativePath} - skipping`);
-                            skippedCount++;
-                        }
-                        continue;
-                    }
+                const commandModule = require(filePath);
+                const command: IApplicationCommand = commandModule.default || commandModule;
 
-                    client.commands.set(command.data.name, command);
-                    loadedCount++;
-                    console.log(`[LOADED] ${command.data.name} (${relativePath})`);
-                } else {
-                    console.warn(`[WARN]  Invalid command structure in ${relativePath} - missing 'data' or 'data.name'`);
-                    skippedCount++;
+                // Validate Command Structure
+                if (!command || !command.data || !command.data.name) {
+                    console.warn(`⚠️  Skipping ${relativePath}: Missing 'data.name' property.`);
+                    stats.skipped++;
+                    continue;
                 }
+
+                const existingCommand = client.commands.get(command.data.name) as IExtendedCommand;
+
+                if (existingCommand) {
+                    // --- MERGE STRATEGY ---
+                    const merged = mergeSubcommands(existingCommand, command, relativePath);
+                    if (merged) {
+                        console.log(`🔗 Merged subcommands from ${relativePath} -> /${command.data.name}`);
+                        stats.merged++;
+                    } else {
+                        stats.skipped++;
+                    }
+                } else {
+                    // --- NEW COMMAND ---
+                    client.commands.set(command.data.name, command);
+                    stats.loaded++;
+                    console.log(`✅ Loaded /${command.data.name} (${relativePath})`);
+                }
+
             } catch (error) {
-                const errorId = errorTracker.trackError(error, 'deployment');
-                console.error(`❌ Failed to load ${relativePath} (Error ID: ${errorId})`);
-                console.error(`   Reason:`, error instanceof Error ? error.message : error);
-                errorCount++;
+                const errorId = errorTracker.trackError(error, 'deployment'); // Ensure 'deployment' is in your ErrorContext type
+                console.error(`❌ Failed to load ${relativePath} (ID: ${errorId})`);
+                stats.errors++;
             }
         }
 
         console.log(`\n🎉 Command Loading Summary:`);
-        console.log(`   ✅ Loaded: ${loadedCount}`);
-        console.log(`   🔗 Merged: ${mergedCount}`);
-        console.log(`   ⚠️  Skipped: ${skippedCount}`);
-        console.log(`   ❌ Errors: ${errorCount}`);
-        console.log(`   📊 Total in collection: ${client.commands.size}`);
-        
+        console.log(`   ✅ Unique Commands: ${stats.loaded}`);
+        console.log(`   🔗 Merged Files:    ${stats.merged}`);
+        console.log(`   ⚠️ Skipped:         ${stats.skipped}`);
+        console.log(`   ❌ Errors:          ${stats.errors}`);
+        console.log(`   📊 Total Map Size:  ${client.commands.size}`);
+
     } catch (error) {
-        const errorId = errorTracker.trackError(error, 'startup');
-        console.error(`❌ Critical error loading commands (ID: ${errorId})`);
-        console.error(`   Check that files are compiled to: ${commandsBasePath}`);
+        errorTracker.trackError(error, 'startup');
+        console.error(`❌ Critical error during command loading:`, error);
     }
 };
