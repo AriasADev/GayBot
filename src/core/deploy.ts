@@ -2,7 +2,7 @@ import { REST, Routes } from 'discord.js';
 import { errorTracker } from './errorTracker';
 import { CustomClient } from '../types'; 
 
-const TOKEN = process.env.DISCORD_TOKEN; 
+const TOKEN = process.env.BOT_TOKEN; 
 const CLIENT_ID = process.env.CLIENT_ID;
 const GUILD_ID = process.env.GUILD_ID; // If set, we are in "Dev Mode"
 
