@@ -19,6 +19,8 @@ const gaynessOverrides = new Map<string, number>([
     ['1025770042245251122', 69],
 ]);
 
+
+
 function calculateGayness(userId: string): number {
     // Check for override first
     if (gaynessOverrides.has(userId)) {
@@ -26,9 +28,12 @@ function calculateGayness(userId: string): number {
     }
     
     // Otherwise, calculate normally
+
+    const weekSeed = Math.floor(Date.now() / 604800000);
+    const seededInput = userId + weekSeed;
     let hash = 0;
     for (let i = 0; i < userId.length; i++) {
-        hash = userId.charCodeAt(i) + ((hash << 5) - hash);
+        hash = seededInput.charCodeAt(i) + ((hash << 5) - hash);
     }
     // Returns a number between 0 and 100
     return Math.abs(hash % 101);
