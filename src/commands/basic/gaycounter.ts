@@ -32,8 +32,9 @@ function calculateGayness(userId: string): number {
     const weekSeed = Math.floor(Date.now() / 604800000);
     const seededInput = userId + weekSeed;
     let hash = 0;
-    for (let i = 0; i < userId.length; i++) {
+    for (let i = 0; i < seededInput.length; i++) {
         hash = seededInput.charCodeAt(i) + ((hash << 5) - hash);
+        hash |= 0;
     }
     // Returns a number between 0 and 100
     return Math.abs(hash % 101);
