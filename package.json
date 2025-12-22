@@ -14,7 +14,7 @@
         "dev": "nodemon --watch src --ext ts --exec \"npm run build && npm run start\""
     },
     "devDependencies": {
-        "@types/node": "^25.0.2",
+        "@types/node": "^25.0.3",
         "typescript": "^5.9.3"
     },
     "dependencies": {
