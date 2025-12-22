@@ -5,7 +5,4 @@ pnpm-lock.yaml
 logs/
 .logs/
 
-# Don't commit the command ID cache (it's deployment-specific)
-.logs/command-ids.json
-
 src/commands/misc
