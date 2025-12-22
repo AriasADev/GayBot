@@ -37,8 +37,9 @@ RUN pnpm install --prod
 # Copy built files from builder stage
 COPY --from=builder /app/dist ./dist
 
-# Create a non-root user
+# Create a non-root user and set up directories with proper permissions
 RUN useradd -m -u 1001 botuser && \
+    mkdir -p /app/.logs && \
     chown -R botuser:botuser /app
 
 # Switch to non-root user
