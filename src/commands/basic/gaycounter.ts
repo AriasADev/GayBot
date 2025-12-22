@@ -12,8 +12,20 @@ import { IApplicationCommand } from '../../core/IApplicationCommand';
 import { CustomClient } from '../../types';
 import { errorTracker } from '../../core/errorTracker';
 
+// Override map for specific user IDs
+const gaynessOverrides = new Map<string, number>([
+    // Add your user IDs here:
+    ['652597508027187240', 100],
+    ['1025770042245251122', 69],
+]);
 
 function calculateGayness(userId: string): number {
+    // Check for override first
+    if (gaynessOverrides.has(userId)) {
+        return gaynessOverrides.get(userId)!;
+    }
+    
+    // Otherwise, calculate normally
     let hash = 0;
     for (let i = 0; i < userId.length; i++) {
         hash = userId.charCodeAt(i) + ((hash << 5) - hash);
