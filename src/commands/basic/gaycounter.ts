@@ -15,7 +15,7 @@ import { errorTracker } from '../../core/errorTracker';
 // Override map for specific user IDs
 const gaynessOverrides = new Map<string, number>([
     // Add your user IDs here:
-    ['652597508027187240', 100],
+    ['652597508027187240', 101],
     ['1025770042245251122', 69],
 ]);
 
