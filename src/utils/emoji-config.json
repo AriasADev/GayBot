@@ -42,6 +42,11 @@
     {
         "emoji": "<:girl_mikuBwaa:1419503673230495756>",
         "title": "Miku",
-        "keywords": ["miku", "hatsune", "vocaloid", "leek"]
+        "keywords": ["miku", "hatsune", "vocaloid", "leek", "1db", "cure", "polkka"]
+    },
+    {
+        "emoji": "<:girl_tetoBwaa:1454541284994846730>",
+        "title": "Teto",
+        "keywords": ["teto", "katsane", "pear", "utau", "override", "tetoris"]
     }
 ]
