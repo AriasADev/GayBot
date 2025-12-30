@@ -7,7 +7,6 @@ import {
     InteractionContextType,
     ApplicationIntegrationType,
     RESTPostAPIChatInputApplicationCommandsJSONBody,
-    User,
     GuildMember 
 } from 'discord.js';
 import { IApplicationCommand } from '../../core/IApplicationCommand';

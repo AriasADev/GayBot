@@ -4,5 +4,7 @@ node_modules
 pnpm-lock.yaml
 logs/
 .logs/
+src/db/
+src/schemas/
 
 src/commands/misc
