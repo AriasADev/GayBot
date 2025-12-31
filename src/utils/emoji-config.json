@@ -2,12 +2,12 @@
     {
         "emoji": "🏳️‍🌈",
         "title": "Gay Flag",
-        "keywords": ["gay", "homo", "gaii", "gae", "fag", "faggot", "queer", "lgbt", "mlm", "men", "gaybot", "gayer", "gayy", "m4m"]
+        "keywords": ["gay", "homo", "gaii", "gae", "queer", "lgbt", "mlm", "men", "gaybot", "gayer", "gayy", "m4m"]
     },
     {
         "emoji": "<:girl_lesbian_flag:1406109269971046462>",
         "title": "Lesbian Flag",
-        "keywords": ["lesb", "lesbian", "wlw", "lesbi", "women", "girls", "dyke", "sapphic", "northampton", "lipstick", "femme", "butch", "lesbians", "lesbianism", "lesbiab", "w4w"]
+        "keywords": ["lesb", "lesbian", "wlw", "lesbi", "women", "girls", "sapphic", "northampton", "lipstick", "femme", "butch", "lesbians", "lesbianism", "lesbiab", "w4w"]
     },
     {
         "emoji": "<:girl_lesbean:1410684874536386742>",
@@ -17,12 +17,27 @@
     {
         "emoji": "🏳️‍⚧️",
         "title": "Trans Flag",
-        "keywords": ["trans", "tranz", "transgender", "sans", "ftm", "mtf", "trans masc", "trans fem", "t4t"]
+        "keywords": ["trans", "tranz", "transgender", "sans", "ftm", "mtf", "transfem", "transmasc", "transfemme", "transfeminine", "transmasculine", "t4t"]
     },
     {
         "emoji": "<:girl_bisexual_flag:1411763935987630153>",
         "title": "Bisexual Flag",
-        "keywords": ["bi", "bisexual", "bisexy", "bi-curious"]
+        "keywords": ["bi", "bisexual"]
+    },
+    {
+        "emoji": "<:girl_flag_nonbinary:1425552404312625233>",
+        "title": "Non-Binary Flag",
+        "keywords": ["nb", "enby", "non binary", "femby", "non-binary", "frisk"]
+    },
+    {
+        "emoji": "<:girl_aromantic_flag:1411764471768027267>",
+        "title": "Aromantic Flag",
+        "keywords": ["aro", "aromantic", "aroace"]
+    },
+    {
+        "emoji": "<:girl_omni_flag:1407073031980847124>",
+        "title": "Omnisexual Flag",
+        "keywords": ["omni", "omnisexual"]
     },
     {
         "emoji": "<:girl_flag_pan:1427028280036561026>",
@@ -37,12 +52,7 @@
     {
         "emoji": "<:girl_asexual_flag:1411764530471637063>",
         "title": "Asexual Flag",
-        "keywords": ["ace", "asexual", "demi", "grey-ace", "a-spec"]
-    },
-    {
-        "emoji": "<:girl_aromantic_flag:1411764471768027267>",
-        "title": "Aromantic Flag",
-        "keywords": ["aro", "aromantic", "aro-spec", "aroace"]
+        "keywords": ["ace", "asexual", "demi", "grey-ace", "aroace", "a-spec"]
     },
     {
         "emoji": "<:girl_lesbianCat:1423465325306839133>",
@@ -52,7 +62,7 @@
     {
         "emoji": "<:girl_gotobed:1429282327334355047>",
         "title": "Tired",
-        "keywords": ["tired", "sleepy", "eepy", "bed", "nappy", "snooze", "exhausted", "zzz", "eepers"]
+        "keywords": ["tired", "sleepy", "eepy", "sleep", "nappy", "snooze", "exhausted", "zzz", "eepers"]
     },
     {
         "emoji": "<:girl_mikuBwaa:1419503673230495756>",
