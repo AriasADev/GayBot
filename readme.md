@@ -5,8 +5,8 @@ The easiest and fastest way to install the bot is by using the [official Discord
 To selfhost the bot, please see out [SELFHOSTING.md](./SELFHOSTING.md)
 
 ### Contributors
-<a href="https://github.com/Girls-Development-Team/GayBot/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Girls-Development-Team/GayBot" />
+<a href="https://github.com/Girls-Network/GayBot/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Girls-Network/GayBot" />
 </a>
 
 # 📜 Licence: GNU NC-GPL v3 — non-commercial use only.  
