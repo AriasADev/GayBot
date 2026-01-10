@@ -1,21 +1,31 @@
-GNU NonCommercial General Public License v3.0 (NC-GPL-3.0)
-==========================================================
+Girls Network Non-Commercial Source Licence (GN-NCSL-1.1)
+========================================================
 
-This is a modified version of the GNU General Public License version 3 (GPLv3).
-It is **not** approved by or affiliated with the Free Software Foundation.
-This license preserves the freedom to use, study, and modify the software
-for personal and non-commercial purposes only.
+Copyright © 2025 Girls Network
+(https://github.com/Girls-Network)
+
+This licence is inspired by the structure and principles of the GNU General
+Public License version 3 (GPLv3), but it is an independent licence with
+materially different terms.
+
+It is NOT approved by, affiliated with, or endorsed by the Free Software
+Foundation. This licence is NOT a GNU licence and is NOT compatible with the
+GNU GPL.
+
+This licence permits use, study, modification, and redistribution of the
+software for personal, educational, and other non-commercial purposes only.
 
 ---------------------------------------------------------------------
 Preamble
 ---------------------------------------------------------------------
 
-The GNU NonCommercial General Public License (NC-GPL) is intended to guarantee
-your freedom to share and change free software for **non-commercial use** —
-to make sure the software is free for all its personal and educational users.
+The Girls Network Non-Commercial Source Licence (GN-NCSL) is intended to ensure
+that software remains freely available for personal, educational, research,
+and community use, while preventing commercial exploitation without explicit
+permission from the copyright holder.
 
-You can use, modify, and share this software freely, provided that you
-do not use it for commercial purposes or for monetary gain.
+You are free to use, modify, and share this software, provided that such use
+is strictly non-commercial and that the terms of this licence are respected.
 
 ---------------------------------------------------------------------
 TERMS AND CONDITIONS
@@ -24,88 +34,106 @@ TERMS AND CONDITIONS
 0. Definitions
 --------------
 
-- “This License” refers to version 3 of the GNU NonCommercial General Public License.
-- “Program” refers to any work licensed under this License.
-- “Commercial use” means use of the Program that is intended for or directed toward
-  **commercial advantage or monetary compensation**.
-- “Personal use” means private, educational, research, or hobbyist use by an
-  individual or non-profit organization.
+- “This Licence” refers to version 1.1 of the Girls Network Non-Commercial
+  Source Licence (GN-NCSL-1.1).
+
+- “Program” refers to any software, source code, or other work licensed
+  under this Licence.
+
+- “Commercial use” means any use of the Program that is intended for, directed
+  toward, or reasonably expected to result in commercial advantage, monetary
+  compensation, or other financial benefit, whether direct or indirect.
+
+- “Non-commercial use” means private, educational, research, hobbyist, or
+  community use that does not involve commercial advantage or monetary gain.
+
+- “Public use” means making the Program available to users outside of the
+  licensee’s private environment, including via websites, hosted services,
+  servers, or networked applications.
 
 1. Permissions
 --------------
 
 You are permitted to:
 
-- Use and run the Program for personal and non-commercial purposes.
-- Copy and distribute verbatim copies of the Program’s source code,
-  provided you include this license and copyright notice.
-- Modify the Program, and distribute your modified version under this
-  same license (NC-GPL-3.0), provided that:
-  - You clearly state that you modified the file(s).
-  - You do not charge a fee or receive monetary compensation.
-  - The Program remains under this same license.
+- Use and run the Program for non-commercial purposes.
+- Copy and distribute verbatim copies of the Program’s source code, provided
+  that this Licence and the copyright notice are included.
+- Modify the Program and distribute your modified version under this same
+  Licence (GN-NCSL-1.1), provided that:
+  - You clearly state that you have modified the Program.
+  - You do not charge any fee or receive monetary compensation.
+  - The modified Program remains licensed under GN-NCSL-1.1.
 
 2. Prohibitions
 ---------------
 
-You may **NOT**:
+You may NOT:
 
-- Use the Program or derivative works for **commercial purposes**, including but
-  not limited to:
-  - Selling the software or any portion thereof.
-  - Using the software in commercial products or services.
-  - Hosting or offering the software as a paid or ad-supported service.
-- Re-license this work under the standard GNU GPL or other licenses that permit
-  commercial use.
-- Combine or distribute this Program with works under GPL or other open source
-  licenses in a way that would make the combined work usable for commercial purposes.
+- Use the Program or any derivative work for commercial purposes, including,
+  but not limited to:
+  - Selling the Program or any portion of it.
+  - Using the Program within commercial products or services.
+  - Hosting, providing, or offering the Program as a paid, monetised, or
+    ad-supported service.
+- Re-license the Program under any licence that permits commercial use.
+- Combine or distribute the Program with other works in a manner that would
+  enable commercial use of the combined work.
 
 3. Attribution
 --------------
 
-If you distribute or publicly use this Program or a modified version, you must:
+If you distribute or publicly use the Program or a modified version, you must:
 
-- Provide appropriate credit to the original author(s).
-- Include a clear and visible link to the original source repository where
-  the Program was obtained (for example, in your README or about page).
-- Include a copy of this license.
+- Provide appropriate credit to the original author(s) and copyright holder.
+- Include a clear and visible link to the original source repository at
+  https://github.com/Girls-Network.
+- Include a copy of this Licence.
 
 4. No Warranty
 --------------
 
-THIS SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+THIS PROGRAM IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY CLAIM,
 DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR
-OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR
-THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE PROGRAM OR THE USE
+OR OTHER DEALINGS IN THE PROGRAM.
 
-5. License Compatibility
+5. Licence Compatibility
 ------------------------
 
-This license is **not compatible** with the GNU GPL or other open-source
-licenses that allow commercial use. Works licensed under this license
-cannot be combined or distributed with works under such licenses.
+This Licence is NOT compatible with the GNU GPL or any other open-source
+licence that permits commercial use. Works licensed under this Licence may
+NOT be combined or distributed with works under such licences.
 
-6. Applying This License
-------------------------
+6. Contributions
+----------------
 
-To apply this license to your work, attach the following notice
-to each source file or in an appropriate location in your project:
+By submitting code, documentation, or other materials to this project, you
+agree that your contributions are licensed under this Licence.
 
-    Copyright (C) 2025 Aria Rees (https://github.com/AriasADev)
-    
-    This program is free software: you may use, modify, and redistribute it
-    under the terms of the GNU NonCommercial General Public License, version 3.
-    
-    This program may NOT be used for commercial purposes.
-    
-    You must include a clear and visible link to the original repository
-    where this program was obtained.
-    
-    You should have received a copy of the GNU NonCommercial General Public License
-    along with this program. If not, see <https://www.gnu.org/licenses/>.
+You grant the copyright holder a perpetual, worldwide, non-exclusive,
+irrevocable right to use, modify, and distribute your contributions under the
+terms of GN-NCSL-1.1.
+
+7. Applying This Licence
+-----------------------
+
+To apply this Licence to your work, include the following notice in an
+appropriate location within the project:
+
+    Copyright © 2025 Girls Network
+    https://github.com/Girls-Network
+
+    Licensed under the Girls Network Non-Commercial Source Licence
+    (GN-NCSL-1.1).
+
+    Non-commercial use only. Commercial use is strictly prohibited.
+
+    A copy of this licence should have been provided with this program.
 
 ---------------------------------------------------------------------
 END OF TERMS AND CONDITIONS
